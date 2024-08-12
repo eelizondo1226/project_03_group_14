@@ -19,38 +19,17 @@ def home():
 def dashboard():
     return render_template('dashboard.html')
 
-@app.route('/cameras')
-def cameras():
-    return render_template('cameras.html')
+@app.route('/map')
+def map():
+    return render_template('map.html')
 
-@app.route('/photos')
-def photos():
-    return render_template('photos.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
+@app.route('/aboutus')
+def aboutus():
+    return render_template('aboutus.html')
 
 @app.route('/chartjs')
 def chartjs():
     return render_template('chartjs.html')
-
-
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-
-# @app.route('/single')
-# def single():
-#     return render_template('single.html')
-
-
-
-@app.route('/bar-chart')
-def bar_chart():
-    return render_template('bar_chart.html')
 
 @app.route('/workcited')
 def workcited():

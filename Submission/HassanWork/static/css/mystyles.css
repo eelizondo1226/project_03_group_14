@@ -17,11 +17,9 @@
     z-index: 1;
     margin-top: 0px;
 }
-.dashboardNav li a{
-   list-style: none;
-   text-decoration: none!important;
-   margin-left: 20px;
-   font-size: 16px;
-   font-weight: 600;
-   color: #fff!important;
+.dashboardNav{
+ margin-top: 23px;
 }
+.dashboardNav li a{
+    font-size: 14px;
+   }
