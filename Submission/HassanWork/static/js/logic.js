@@ -8,7 +8,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(myMap);
 
 // Fetch the JSON data
-const URL = "storms_final.json";
+const URL = "static/js/storms_final.json";
 
 d3.json(URL).then(function (data) {
   // Function to plot markers based on filtered data
