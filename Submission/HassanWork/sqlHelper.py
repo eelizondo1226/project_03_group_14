@@ -1,155 +1,79 @@
 import sqlalchemy
-# from sqlalchemy.ext.automap import automap_base
-# from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, text, func
-import datetime
-
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 import pandas as pd
-import numpy as np
-
-# The Purpose of this Class is to separate out any Database logic
-class SQLHelper():
-    #################################################
-    # Database Setup
-    #################################################
-
-    # define properties
+import calendar
+class SQLHelper:
     def __init__(self):
-        self.engine = create_engine("sqlite:///spacex.sqlite")
-        # self.Base = None
-
-        # automap Base classes
-        # self.init_base()
-
-    # COMMENT BACK IN IF USING THE ORM
-
-    # def init_base(self):
-    #     # reflect an existing database into a new model
-    #     self.Base = automap_base()
-    #     # reflect the tables
-    #     self.Base.prepare(autoload_with=self.engine)
-
-    #################################################
-    # Database Queries
-    #################################################
-
-    # USING RAW SQL
-    def get_bar(self, min_attempts, region):
-
-        # switch on user_region
-        if region == 'All':
-            where_clause = "and 1=1"
-        else:
-            where_clause = f"and region = '{region}'"
-
-        # build the query
-        query = f"""
-            SELECT
-                name,
-                full_name,
-                region,
-                launch_attempts,
-                launch_successes
-            FROM
-                launchpads
-            WHERE
-                launch_attempts >= {min_attempts}
-                {where_clause}
-            ORDER BY
-                launch_attempts DESC;
+        # Initialize the engine and base
+        self.engine = create_engine("sqlite:///storms_final.sqlite")
+        self.Base = None
+        self.Session = sessionmaker(bind=self.engine)
+        self.init_base()
+    def init_base(self):
+        # Prepare the base for reflecting existing tables
+        self.Base = automap_base()
+        self.Base.prepare(autoload_with=self.engine)
+    def query_storms_by_month(self):
+        query = """
+        SELECT
+            month,
+            COUNT(*) AS storm_count
+        FROM storm_data
+        GROUP BY month
+        ORDER BY month;
         """
-
-        df = pd.read_sql(text(query), con = self.engine)
-        data = df.to_dict(orient="records")
-        return(data)
-
-    def get_pie(self, min_attempts, region):
-
-        # switch on user_region
-        if region == 'All':
-            where_clause = "and 1=1"
-        else:
-            where_clause = f"and region = '{region}'"
-
-        # build the query
-        query = f"""
-            SELECT
-                name,
-                region,
-                launch_attempts
-            FROM
-                launchpads
-            WHERE
-                launch_attempts >= {min_attempts}
-                {where_clause}
-            ORDER BY
-                launch_attempts DESC;
+        with self.Session() as session:
+            df = pd.read_sql_query(query, self.engine)
+        # Convert month numbers to month names
+        df['month_name'] = df['month'].apply(lambda x: calendar.month_name[x])
+        result = {
+            'labels': df['month_name'].tolist(),
+            'values': df['storm_count'].tolist()
+        }
+        return result
+    def query_hurricane_number_bar(self):
+        query = """
+        SELECT
+            category,
+            COUNT(*) AS number_of_hurricanes
+        FROM storm_data
+        WHERE status = 'hurricane'
+        GROUP BY category
+        ORDER BY category;
         """
-
-        df = pd.read_sql(text(query), con = self.engine)
-        data = df.to_dict(orient="records")
-        return(data)
-
-    def get_table(self, min_attempts, region):
-
-        # switch on user_region
-        if region == 'All':
-            where_clause = "and 1=1"
-        else:
-            where_clause = f"and region = '{region}'"
-
-        # build the query
-        query = f"""
-            SELECT
-                name,
-                full_name,
-                region,
-                latitude,
-                longitude,
-                launch_attempts,
-                launch_successes,
-                launch_attempts - launch_successes as launch_failures
-            FROM
-                launchpads
-            WHERE
-                launch_attempts >= {min_attempts}
-                {where_clause}
-            ORDER BY
-                launch_attempts DESC;
+        with self.Session() as session:
+            df = pd.read_sql_query(query, self.engine)
+        result = {
+            'categories': df['category'].tolist(),
+            'number_of_hurricanes': df['number_of_hurricanes'].tolist()
+        }
+        return result
+    def query_hurricane_by_decade(self):
+        query = """
+        SELECT
+            FLOOR(year / 10) * 10 AS decade_start,
+            category,
+            COUNT(*) AS hurricane_count
+        FROM storm_data
+        WHERE status = 'hurricane'
+            AND year BETWEEN 1852 AND 2021
+        GROUP BY
+            FLOOR(year / 10) * 10,
+            category
+        ORDER BY
+            decade_start,
+            category;
         """
-
-        df = pd.read_sql(text(query), con = self.engine)
-        data = df.to_dict(orient="records")
-        return(data)
-
-    def get_map(self, min_attempts, region):
-
-        # switch on user_region
-        if region == 'All':
-            where_clause = "and 1=1"
-        else:
-            where_clause = f"and region = '{region}'"
-
-        # build the query
-        query = f"""
-            SELECT
-                name,
-                full_name,
-                region,
-                latitude,
-                longitude,
-                launch_attempts,
-                launch_successes,
-                launch_attempts - launch_successes as launch_failures
-            FROM
-                launchpads
-            WHERE
-                launch_attempts >= {min_attempts}
-                {where_clause}
-            ORDER BY
-                launch_attempts DESC;
-        """
-
-        df = pd.read_sql(text(query), con = self.engine)
-        data = df.to_dict(orient="records")
-        return(data)
+        with self.Session() as session:
+            df = pd.read_sql_query(query, self.engine)
+        # Pivot the data for stacked bar chart
+        df_pivot = df.pivot(index='decade_start', columns='category', values='hurricane_count').fillna(0)
+        # Convert DataFrame to dictionary format suitable for plotting
+        result = {
+            'decades': df_pivot.index.tolist(),
+            'categories': df_pivot.columns.tolist(),
+            'data': df_pivot.to_dict(orient='list')
+        }
+        return result

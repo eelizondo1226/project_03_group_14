@@ -15,7 +15,8 @@
 		<!-- Loading main css file -->
 		<link rel="stylesheet" href="./static/css/style.css">
 		<link rel="stylesheet" href="./static/css/mystyles.css">
-		
+		<!-- MDB -->
+	
 		<!--[if lt IE 9]>
 		<script src="js/ie-support/html5.js"></script>
 		<script src="js/ie-support/respond.js"></script>
@@ -54,22 +55,25 @@
 				</div>
 			</div> <!-- .site-header -->
         
-		 <div class="hero" data-bg-image="./static/images/Stro2.mp4" height="100px"> 
+		 <div class="hero" data-bg-image="./static/images/Stro2.mp4" height="600px"> 
 				<video autoplay muted loop playsinline width="100%" >
 				<source src="./static/images/Stro2.mp4" type="video/mp4" />
-			</div> 
+			
+				</video>
+		 </div> 
 		
 				
+		 <h2 class="main-contenth2">Storms of Atlantic Basin</h2>
 			
-			</video>
-			<div class="forecast-table">
+			 {#<div class="forecast-table">
 				<div class="container">
 					<div class="forecast-container">
 						<div class="today forecast">
 							<div class="forecast-header">
 								<div class="day">Monday</div>
 								<div class="date">6 Oct</div>
-							</div> <!-- .forecast-header -->
+							</div> 
+							<!-- .forecast-header -->
 							<div class="forecast-content">
 								<div class="location">New York</div>
 								<div class="degree">
@@ -86,7 +90,8 @@
 						<div class="forecast">
 							<div class="forecast-header">
 								<div class="day">Tuesday</div>
-							</div> <!-- .forecast-header -->
+							</div> 
+							<!-- .forecast-header -->
 							<div class="forecast-content">
 								<div class="forecast-icon">
 									<img src="images/icons/icon-3.svg" alt="" width=48>
@@ -157,38 +162,39 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div>#}
+			
 			<main class="main-content">
 				<div class="fullwidth-block">
 					<div class="container">
-						<h2 class="section-title">Storm location</h2>
+						
 						<div class="row">
 							<div class="col-md-3 col-sm-6">
 								<div class="live-camera">
 									<figure class="live-camera-cover"><img src="images/live-camera-1.jpg" alt=""></figure>
-									<h3 class="location">New York</h3>
-									<small class="date">8 oct, 8:00AM</small>
+									<h3 class="location"></h3>
+									<small class="date"></small>
 								</div>
 							</div>
 							<div class="col-md-3 col-sm-6">
 								<div class="live-camera">
 									<figure class="live-camera-cover"><img src="images/live-camera-2.jpg" alt=""></figure>
-									<h3 class="location">Los Angeles</h3>
-									<small class="date">8 oct, 8:00AM</small>
+									<h3 class="location"></h3>
+									<small class="date"></small>
 								</div>
 							</div>
 							<div class="col-md-3 col-sm-6">
 								<div class="live-camera">
 									<figure class="live-camera-cover"><img src="images/live-camera-3.jpg" alt=""></figure>
-									<h3 class="location">Chicago</h3>
-									<small class="date">8 oct, 8:00AM</small>
+									<h3 class="location"></h3>
+									<small class="date"></small>
 								</div>
 							</div>
 							<div class="col-md-3 col-sm-6">
 								<div class="live-camera">
 									<figure class="live-camera-cover"><img src="images/live-camera-4.jpg" alt=""></figure>
-									<h3 class="location">London</h3>
-									<small class="date">8 oct, 8:00AM</small>
+									<h3 class="location"></h3>
+									<small class="date"></small>
 								</div>
 							</div>
 						</div>
@@ -207,14 +213,14 @@
 							</div>
 							<div class="col-md-4">
 								<div class="news">
-									<div class="date">2022</div>
+									<div class="date">1852</div>
 									<h3><a href="#">Florida,France,Spain and Pakistan </a></h3>
 									<p>several dangerous weather events made headlines globally. In the United States, Hurricane Ian caused widespread flooding and destruction in Florida, while severe droughts in the western states exacerbated wildfire conditions. Europe was hit by an unprecedented heatwave, with record temperatures recorded in countries like France and Spain, leading to severe drought and wildfires. In Asia, catastrophic flooding in Pakistan inundated vast areas, displacing millions and causing extensive damage. Australia faced a significant increase in bushfires, fueled by prolonged dry conditions. These events highlighted the growing impacts of extreme weather and climate change across the world.</p>
 								</div>
 							</div>
 							<div class="col-md-4">
 								<div class="news">
-									<div class="date">2023</div>
+									<div class="date">1960</div>
 									<h3><a href="#">Gulf Coast </a></h3>
 									<p>Europe experienced intense heatwaves, leading to wildfires in southern countries such as Spain and Italy, and record temperatures in the UK. In Asia, severe monsoon rains in India and Bangladesh triggered catastrophic flooding, displacing thousands. Australia faced prolonged drought conditions exacerbating bushfires in several states. These events underscored the growing frequency and severity of dangerous weather across different regions.</p>
 								</div>
@@ -256,18 +262,16 @@
 								</ul>
 							</div>
 							<div class="col-md-4">
-								<h2 class="section-title">Awesome Photos</h2>
-								<div class="photo-grid">
-									<a href="#"><img src="images/thumb-1.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-2.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-3.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-4.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-5.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-6.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-7.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-8.jpg" alt="#"></a>
-									<a href="#"><img src="images/thumb-9.jpg" alt="#"></a>
-								</div>
+								<h2 class="section-title">Weather Prediction</h2>
+								<ul class="arrow-list">
+									<li><a href="#"> Local and Global Weather Stations: Gather data from a variety of sources to ensure a comprehensive dataset. Include variables like temperature, humidity, precipitation, wind speed, and atmospheric pressure..</a></li>
+									<li><a href="#">Use the historical trends and relationships identified through your analysis to build predictive models. Techniques such as time series analysis or machine learning algorithms can be employed to forecast weather patterns for the past four years.</a></li>
+									<li><a href="#">Incorporate real-time weather updates for current analysis and forecasting.</a></li>
+									<li><a href="#">Analyze relative humidity levels and their variations over time.</a></li>
+									<li><a href="#">Detect long-term trends using methods such as linear regression.</a></li>
+									<li><a href="#">Show spatial variations in weather variables.</a></li>
+									<li><a href="#">Map out spatial variations in weather data to visualize how weather patterns differ across different regions.</a></li>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -297,7 +301,8 @@
 				</div>
 			</footer> <!-- .site-footer -->
 		</div>
-		
+		<!-- MDB -->
+
 		<script src="./static/js/jquery-1.11.1.min.js"></script>
 		<script src="./static/js/plugins.js"></script>
 		<script src="./static/js/app.js"></script>

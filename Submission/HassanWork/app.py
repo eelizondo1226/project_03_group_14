@@ -35,46 +35,18 @@ def chartjs():
 def workcited():
     return render_template('workcited.html')
 
-@app.route('/api/data')
-def api_data():
-    data = {
-        'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        'values': [10, 20, 15, 30, 25]
-    }
+@app.route("/api/storms_by_month")
+def storms_by_month():
+    data = sql.query_storms_by_month()
     return jsonify(data)
-
-# SQL Queries
-@app.route("/api/v1.0/get_dashboard/<min_attempts>/<region>")
-def get_dashboard(min_attempts, region):
-    min_attempts = int(min_attempts) # cast to int
-
-    bar_data = sql.get_bar(min_attempts, region)
-    pie_data = sql.get_pie(min_attempts, region)
-    table_data = sql.get_table(min_attempts, region)
-
-    data = {
-        "bar_data": bar_data,
-        "pie_data": pie_data,
-        "table_data": table_data
-    }
-    return(jsonify(data))
-
-
-
-
-
-# @app.route('/api/filter-data', methods=['GET'])
-# def filter_data():
-#     all_data = [
-#         {'category': 'A', 'value': 10},
-#         {'category': 'B', 'value': 20},
-#         {'category': 'A', 'value': 15},
-#         {'category': 'C', 'value': 30},
-#         {'category': 'B', 'value': 25}
-#     ]
-#     category = request.args.get('category', default='A', type=str)
-#     filtered_data = [item for item in all_data if item['category'] == category]
-#     return jsonify(filtered_data)
+@app.route("/api/hurricane_number")
+def hurricane_number():
+    data = sql.query_hurricane_number_bar()
+    return jsonify(data)
+@app.route("/api/hurricane_by_decade")
+def hurricane_by_decade():
+    data = sql.query_hurricane_by_decade()
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)

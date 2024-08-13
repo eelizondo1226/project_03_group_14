@@ -264,7 +264,7 @@ form textarea {
   color: white; }
 
 .map {
-  height: 220px; }
+  height: 400px; }
 
 .container {
   margin-right: auto;
@@ -1521,7 +1521,7 @@ form textarea {
   margin-bottom: 30px; }
   .photo .photo-preview {
     position: absolute;
-    width: 50%;
+    width: 38%;
     left: 0;
     top: 0;
     bottom: 0;
@@ -1582,8 +1582,7 @@ form textarea {
       left: 0;
       top: 0; }
   .contact-details a {
-    margin-right: 150px;
-    color🟦 }
+    margin-right: 150px; }
     .contact-details a img {
       margin-right: 150px;
       vertical-align: middle; }
@@ -1605,6 +1604,11 @@ form textarea {
   min-height: 150px; }
 .contact-form .text-right {
   text-align: right; }
+
+  .leaflet-container{
+ height: 400px;
+    
+  }
 
 .sidebar .widget {
   background: #262936;

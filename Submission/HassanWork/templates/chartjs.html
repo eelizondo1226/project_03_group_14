@@ -1,178 +1,223 @@
+import sqlalchemy
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+import pandas as pd
+import calendar
+class SQLHelper:
+    def __init__(self):
+        # Initialize the engine and base
+        self.engine = create_engine("sqlite:///storms_final.sqlite")
+        self.Base = None
+        self.Session = sessionmaker(bind=self.engine)
+        self.init_base()
+    def init_base(self):
+        # Prepare the base for reflecting existing tables
+        self.Base = automap_base()
+        self.Base.prepare(autoload_with=self.engine)
+    def query_storms_by_month(self):
+        query = """
+        SELECT
+            month,
+            COUNT(*) AS storm_count
+        FROM storm_data
+        GROUP BY month
+        ORDER BY month;
+        """
+        with self.Session() as session:
+            df = pd.read_sql_query(query, self.engine)
+        # Convert month numbers to month names
+        df['month_name'] = df['month'].apply(lambda x: calendar.month_name[x])
+        result = {
+            'labels': df['month_name'].tolist(),
+            'values': df['storm_count'].tolist()
+        }
+        return result
+    def query_hurricane_number_bar(self):
+        query = """
+        SELECT
+            category,
+            COUNT(*) AS number_of_hurricanes
+        FROM storm_data
+        WHERE status = 'hurricane'
+        GROUP BY category
+        ORDER BY category;
+        """
+        with self.Session() as session:
+            df = pd.read_sql_query(query, self.engine)
+        result = {
+            'categories': df['category'].tolist(),
+            'number_of_hurricanes': df['number_of_hurricanes'].tolist()
+        }
+        return result
+    def query_hurricane_by_decade(self):
+        query = """
+        SELECT
+            FLOOR(year / 10) * 10 AS decade_start,
+            category,
+            COUNT(*) AS hurricane_count
+        FROM storm_data
+        WHERE status = 'hurricane'
+            AND year BETWEEN 1852 AND 2021
+        GROUP BY
+            FLOOR(year / 10) * 10,
+            category
+        ORDER BY
+            decade_start,
+            category;
+        """
+        with self.Session() as session:
+            df = pd.read_sql_query(query, self.engine)
+        # Pivot the data for stacked bar chart
+        df_pivot = df.pivot(index='decade_start', columns='category', values='hurricane_count').fillna(0)
+        # Convert DataFrame to dictionary format suitable for plotting
+        result = {
+            'decades': df_pivot.index.tolist(),
+            'categories': df_pivot.columns.tolist(),
+            'data': df_pivot.to_dict(orient='list')
+        }
+        return result
+4:11
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Corona Admin</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="./static/css/style.css">
-		<link rel="stylesheet" href="./static/css/mystyles.css">
-    <link rel="stylesheet" href="./static/assets/vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="./static/assets/vendors/ti-icons/css/themify-icons.css">
-    <link rel="stylesheet" href="./static/assets/vendors/css/vendor.bundle.base.css">
-    <link rel="stylesheet" href="./static/assets/vendors/font-awesome/css/font-awesome.min.css">
-    <!-- endinject -->
-    <!-- Plugin css for this page -->
-    <!-- End Plugin css for this page -->
-    <!-- inject:css -->
-    <!-- endinject -->
-    <!-- Layout styles -->
-    <link rel="stylesheet" href="./static/assets/css/style.css">
-    <!-- End layout styles -->
-    <link rel="shortcut icon" href="./static/assets/images/favicon.png" />
-    <link rel="stylesheet" href="./static/css/style.css">
-		<link rel="stylesheet" href="./static/css/mystyles.css">
-  </head>
-  <body>
-    <div class="container-scroller">
-      <!-- partial:../../partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
-        <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
-          <a class="sidebar-brand brand-logo" href="../../index.html"><img src="./static/assets/images/logo.svg" alt="logo" /></a>
-          <a class="sidebar-brand brand-logo-mini" href="../../index.html"><img src="./static/assets/images/logo-mini.svg" alt="logo" /></a>
-        </div>
-        <ul class="nav">
-  
-          <li class="nav-item menu-items">
-            <a class="nav-link" href="/chartjs">
-              <span class="menu-icon">
-                <i class="mdi mdi-chart-bar"></i>
-              </span>
-              <span class="menu-title">Charts</span>
-              <i class="menu-arrow"></i>
-            </a>
-          </li>
-       
-         
-         
-        </ul>
-      </nav>
-      <!-- partial -->
-      <div class="container-fluid page-body-wrapper">
-        <!-- partial:../../partials/_navbar.html -->
-        <nav class="navbar p-0 fixed-top d-flex flex-row">
-        
-		 
-          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
-            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-              <span class="mdi mdi-menu"></span>
-            </button>
-         
-            <div class="main-navigation dashboardNav">
-              <button type="button" class="menu-toggle"><i class="fa fa-bars"></i></button>
-              <ul class="menu">
-                <li class="menu-item "><a href="/home">Home</a></li>
-                <li class="menu-item current-menu-item"><a href="/dashboard">Dashboard</a></li>
-                <li class="menu-item"><a href="/map">Map</a></li>
-                <li class="menu-item"><a href="/aboutus">About Us</a></li>
-                <li class="menu-item"><a href="/workcited">Work Cited</a></li>
-              </ul> <!-- .menu -->
-            </div> <!-- .main-navigation -->
-            </ul>
-            
-          </div>
-        </nav>
-        <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">
-            <div class="page-header">
-              <h3 class="page-title"> Chart-js </h3>
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="#">Charts</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Chart-js</li>
-                </ol>
-              </nav>
-            </div>
-            <div class="row">
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Line chart</h4>
-                    <canvas id="lineChart" style="height:250px"></canvas>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Bar chart</h4>
-                    <canvas id="barChart" style="height:230px"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Area chart</h4>
-                    <canvas id="areaChart" style="height:250px"></canvas>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Doughnut chart</h4>
-                    <div class="doughnutjs-wrapper d-flex justify-content-center">
-                      <canvas id="doughnutChart" style="height:250px"></canvas>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Pie chart</h4>
-                    <div class="doughnutjs-wrapper d-flex justify-content-center">
-                      <canvas id="pieChart" style="height:250px"></canvas>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Scatter chart</h4>
-                    <canvas id="scatterChart" style="height:250px"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:../../partials/_footer.html -->
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 Hassan Aftab. All rights reserved.</span>
-              <span class="text-muted float-none float-sm-end d-block mt-1 mt-sm-0 text-center"> <span class="text-muted float-none float-sm-end d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="mdi mdi-heart text-danger"></i></span> <i class="mdi mdi-heart text-danger"></i></span>
-            </div>
-          </footer>
-          <!-- partial -->
-        </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
-    <script src="./static/assets/vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="./static/assets/vendors/chart.js/chart.umd.js"></script>
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="./static/assets/js/off-canvas.js"></script>
-    <script src="./static/assets/js/misc.js"></script>
-    <script src="./static/assets/js/settings.js"></script>
-    <script src="./static/assets/js/todolist.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page -->
-    <script src="./static/assets/js/chart.js"></script>
-    <!-- End custom js for this page -->
-  </body>
+<html>
+<head>
+    <title>Chart.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Charts</h1>
+    <h2>Storms by Month</h2>
+    <canvas id="stormsByMonthChart"></canvas>
+    <h2>Hurricane Number by Category</h2>
+    <canvas id="hurricaneNumberChart"></canvas>
+    <h2>Hurricanes by Decade and Category</h2>
+    <canvas id="hurricaneByDecadeChart"></canvas>
+    <script>
+        async function fetchDataAndRenderCharts() {
+            try {
+                const [stormsByMonthResponse, hurricaneNumberResponse, hurricaneByDecadeResponse] = await Promise.all([
+                    fetch('/api/storms_by_month'),
+                    fetch('/api/hurricane_number'),
+                    fetch('/api/hurricane_by_decade')
+                ]);
+                const stormsByMonthData = await stormsByMonthResponse.json();
+                const hurricaneNumberData = await hurricaneNumberResponse.json();
+                const hurricaneByDecadeData = await hurricaneByDecadeResponse.json();
+                // Render Storms by Month Chart as Line Chart
+                const ctx1 = document.getElementById('stormsByMonthChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: stormsByMonthData.labels,
+                        datasets: [{
+                            label: 'Number of Storms',
+                            data: stormsByMonthData.values,
+                            borderColor: 'rgba(173, 216, 230, 1)',
+                            borderWidth: 1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Month'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Number of Storms'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                // Render Hurricane Number by Category Chart
+                const ctx2 = document.getElementById('hurricaneNumberChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: hurricaneNumberData.categories,
+                        datasets: [{
+                            label: 'Number of Hurricanes',
+                            data: hurricaneNumberData.number_of_hurricanes,
+                            backgroundColor: [
+                                'blue',  // Category 1
+                                'green', // Category 2
+                                'yellow', // Category 3
+                                'orange', // Category 4
+                                'red'     // Category 5
+                            ],
+                            borderColor: [
+                                'blue',  // Category 1
+                                'green', // Category 2
+                                'yellow', // Category 3
+                                'orange', // Category 4
+                                'red'     // Category 5
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                // Render Hurricanes by Decade and Category Chart
+                const ctx3 = document.getElementById('hurricaneByDecadeChart').getContext('2d');
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: hurricaneByDecadeData.decades,
+                        datasets: hurricaneByDecadeData.categories.map(category => ({
+                            label: `Category ${category}`,
+                            data: hurricaneByDecadeData.data[category] || [],
+                            backgroundColor: getCategoryColor(category),
+                            borderColor: getCategoryColor(category),
+                            borderWidth: 1
+                        }))
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                stacked: true
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching data or rendering charts:', error);
+            }
+        }
+        function getCategoryColor(category) {
+            const colors = {
+                1: 'blue',
+                2: 'green',
+                3: 'yellow',
+                4: 'orange',
+                5: 'red'
+            };
+            return colors[category] || 'gray'; // Default color if category is not found
+        }
+        // Call the function to fetch data and render charts
+        fetchDataAndRenderCharts();
+    </script>
+</body>
 </html>
+
+
+
+
+
+
+
