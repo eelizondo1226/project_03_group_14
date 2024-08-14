@@ -1,0 +1,28 @@
+
+
+
+.hero {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    z-index: 0;
+}
+/* .forecast-table {
+    position: relative;
+    z-index: 1;
+} */
+.main-contenth2 {
+    position: relative;
+    z-index: 1;
+    font-size: 60px;
+    text-align: center;
+}
+.dashboardNav{
+ margin-top: 23px;
+}
+.dashboardNav li a{
+    font-size: 14px;
+   }
+   .photo-preview {
+    width: 50%!important;
+   }

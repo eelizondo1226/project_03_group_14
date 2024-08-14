@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Charts</h1>
+    <h2>Storms by Month</h2>
+    <canvas id="stormsByMonthChart"></canvas>
+    <h2>Hurricane Number by Category</h2>
+    <canvas id="hurricaneNumberChart"></canvas>
+    <h2>Hurricanes by Decade and Category</h2>
+    <canvas id="hurricaneByDecadeChart"></canvas>
+    <script>
+        async function fetchDataAndRenderCharts() {
+            try {
+                const [stormsByMonthResponse, hurricaneNumberResponse, hurricaneByDecadeResponse] = await Promise.all([
+                    fetch('/api/storms_by_month'),
+                    fetch('/api/hurricane_number'),
+                    fetch('/api/hurricane_by_decade')
+                ]);
+                const stormsByMonthData = await stormsByMonthResponse.json();
+                const hurricaneNumberData = await hurricaneNumberResponse.json();
+                const hurricaneByDecadeData = await hurricaneByDecadeResponse.json();
+                // Render Storms by Month Chart as Line Chart
+                const ctx1 = document.getElementById('stormsByMonthChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: stormsByMonthData.labels,
+                        datasets: [{
+                            label: 'Number of Storms',
+                            data: stormsByMonthData.values,
+                            borderColor: 'blue',
+                            borderWidth: 1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Month'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Number of Storms'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                // Render Hurricane Number by Category Chart
+                const ctx2 = document.getElementById('hurricaneNumberChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: hurricaneNumberData.categories,
+                        datasets: [{
+                            label: 'Number of Hurricanes',
+                            data: hurricaneNumberData.number_of_hurricanes,
+                            backgroundColor: [
+                                'blue',  // Category 1
+                                'green', // Category 2
+                                'yellow', // Category 3
+                                'orange', // Category 4
+                                'red'     // Category 5
+                            ],
+                            borderColor: [
+                                'blue',  // Category 1
+                                'green', // Category 2
+                                'yellow', // Category 3
+                                'orange', // Category 4
+                                'red'     // Category 5
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+                // Render Hurricanes by Decade and Category Chart
+                const ctx3 = document.getElementById('hurricaneByDecadeChart').getContext('2d');
+                new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: hurricaneByDecadeData.decades,
+                        datasets: hurricaneByDecadeData.categories.map(category => ({
+                            label: `Category ${category}`,
+                            data: hurricaneByDecadeData.data[category] || [],
+                            backgroundColor: getCategoryColor(category),
+                            borderColor: getCategoryColor(category),
+                            borderWidth: 1
+                        }))
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                stacked: true
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching data or rendering charts:', error);
+            }
+        }
+        function getCategoryColor(category) {
+            const colors = {
+                1: 'blue',
+                2: 'green',
+                3: 'yellow',
+                4: 'orange',
+                5: 'red'
+            };
+            return colors[category] || 'gray'; // Default color if category is not found
+        }
+        // Call the function to fetch data and render charts
+        fetchDataAndRenderCharts();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
