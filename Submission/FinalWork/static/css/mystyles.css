@@ -25,4 +25,10 @@
    }
    .photo-preview {
     width: 50%!important;
+    background-position: center right;
    }
+
+canvas {
+    width: 50%!important;
+    height: 500px!important;
+}

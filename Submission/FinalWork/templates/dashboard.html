@@ -3,8 +3,20 @@
 <head>
     <title>Chart.js Example</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="./static/css/style.css">
+    <link rel="stylesheet" href="./static/css/mystyles.css">
 </head>
 <body>
+    <div class="main-navigation dashboardNav">
+        <button type="button" class="menu-toggle"><i class="fa fa-bars"></i></button>
+        <ul class="menu">
+            <li class="menu-item "><a href="/home">Home</a></li>
+            <li class="menu-item current-menu-item"><a href="/dashboard">Dashboard</a></li>
+            <li class="menu-item"><a href="/map">Map</a></li>
+            <li class="menu-item"><a href="/aboutus">About Us</a></li>
+            <li class="menu-item"><a href="/workcited">Work Cited</a></li>
+        </ul> <!-- .menu -->
+    </div> <!-- .main-navigation -->
     <h1>Charts</h1>
     <h2>Storms by Month</h2>
     <canvas id="stormsByMonthChart"></canvas>
@@ -32,7 +44,7 @@
                         datasets: [{
                             label: 'Number of Storms',
                             data: stormsByMonthData.values,
-                            borderColor: 'blue',
+                            borderColor: 'yellow',
                             borderWidth: 1,
                             fill: false
                         }]
